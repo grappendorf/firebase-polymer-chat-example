@@ -1,0 +1,20 @@
+{
+  "name": "firebase-polymer-chat-example",
+  "version": "0.0.1",
+  "description": "A small Firebase/Polymer chat example application",
+  "license": "MIT",
+  "authors": [
+    "Dirk Grappendorf <dirk@grappendorf.net>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grappendorf/firebase-polymer-chat-example.git"
+  },
+  "dependencies": {
+    "iron-list": "PolymerElements/iron-list#1.x.x",
+    "paper-fab": "PolymerElements/paper-fab#1.x.x",
+    "paper-input": "PolymerElements/paper-input#1.x.x",
+    "paper-material": "PolymerElements/paper-material#1.x.x",
+    "firebase-element": "PolymerElements/firebase-element#1.x.x"
+  }
+}

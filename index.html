@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>firebase-polymer-chat-example</title>
+  <script src='lib/webcomponentsjs/webcomponents-lite.min.js'></script>
+  <link rel="import" href="lib/iron-icons/iron-icons.html">
+  <link rel="import" href="lib/iron-list/iron-list.html">
+  <link rel="import" href="lib/paper-fab/paper-fab.html" rel="import">
+  <link rel="import" href="lib/paper-input/paper-input.html" rel="import">
+  <link rel="import" href="lib/paper-material/paper-material.html" rel="import">
+  <link rel="import" href="lib/firebase-element/firebase-collection.html" rel="import">
+
+  <style>
+    #content {
+      width: 50%;
+      margin: 32px auto;
+    }
+
+    iron-list {
+      height: 20em;
+    }
+
+    paper-fab {
+      margin-top: 2em;
+    }
+
+    paper-input {
+      width: 100%;
+    }
+
+    #text {
+      margin-top: 2em;
+    }
+  </style>
+</head>
+
+<body class="fullbleed unresolved">
+
+  <template id="app" is="dom-bind">
+
+    <firebase-collection id="messages" location="[[url(firebaseUrl, 'messages')]]"
+                         data="{{messages}}" order-by-child="time" limit-to-last="100">
+    </firebase-collection>
+
+    <div id="content">
+      <div class="layout vertical" hidden$="[[connected]]">
+        <paper-input id=token" label="Enter the firebase url" autofocus
+                     value="{{firebaseUrl}}" on-change="focusUser"></paper-input>
+        <paper-input id="user" label="Enter your user name and join the chat" autofocus
+                     value="{{user}}" on-change="connect"></paper-input>
+        <paper-fab icon="forward" class="self-end" disabled="[[!canConnect(firebaseUrl, user)]]"
+                   on-tap="connect"></paper-fab>
+      </div>
+
+      <div class="layout vertical" hidden$="[[!connected]]">
+        <paper-material>
+          <iron-list id="messageList" items="[[messages]]" as="message" class="flex">
+            <template>
+              <div>
+                <b>[[message.user]]</b>:&nbsp;<span>[[message.text]]</span>
+              </div>
+            </template>
+          </iron-list>
+        </paper-material>
+        <paper-input id="text" label="Type your message and hit enter..." no-label-float
+                     value="{{text}}" on-change="publishMessage"></paper-input>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    var app = document.querySelector('#app');
+    app.connected = false;
+    app.observers = ['messagesChanged(messages.*)'];
+    app.url = function(baseUrl, path) {
+      return baseUrl ? (baseUrl + '/' + path) : null;
+    };
+    app.focusUser = function() {
+      app.$.user.$$('input').focus();
+    };
+    app.canConnect = function(url, user) {
+      return url && user;
+    };
+    app.connect = function() {
+      app.connected = true;
+      app.$.messages.add({
+        time: Firebase.ServerValue.TIMESTAMP, user: 'system',
+        text: 'User ' + app.user + ' has joined the chat'
+      });
+    };
+    app.publishMessage = function() {
+      app.$.messages.add({
+        time: Firebase.ServerValue.TIMESTAMP, user: app.user, text: app.text
+      });
+      app.text = '';
+    };
+    app.messagesChanged = function() {
+      if (app.messages.length > 0) {
+        app.$.messageList.scrollToIndex(app.messages.length - 1);
+      }
+    }
+  </script>
+
+  <script src="//localhost:35729/livereload.js"></script>
+
+</body>
+
+</html>
